@@ -21,6 +21,7 @@ import Settings from '../../../../config/defaultSettings';
 import React, { useState } from 'react';
 import { flushSync } from 'react-dom';
 import { createStyles } from 'antd-style';
+import logoImg from '../../../../public/images/logo.png';
 
 const useStyles = createStyles(({ token }) => {
   return {
@@ -51,9 +52,10 @@ const useStyles = createStyles(({ token }) => {
       flexDirection: 'column',
       height: '100vh',
       overflow: 'auto',
-      backgroundImage:
-        "url('https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/V-_oS6r-i7wAAAAAAAAAAAAAFl94AQBr')",
+      // backgroundImage:
+        // "url('https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/V-_oS6r-i7wAAAAAAAAAAAAAFl94AQBr')",
       backgroundSize: '100% 100%',
+      background: 'radial-gradient(circle at center,rgb(238, 243, 247) 0%,rgb(196, 223, 246) 40%, #722ed1 100%)',
     },
   };
 });
@@ -166,23 +168,26 @@ const Login: React.FC = () => {
             minWidth: 280,
             maxWidth: '75vw',
           }}
-          logo={<img alt="logo" src="/logo.svg" />}
-          title="Ant Design"
+          logo={<img alt="logo" src={logoImg} style={{ borderRadius: '40%' }} />}
+          title="评海星"
           subTitle={intl.formatMessage({ id: 'pages.layouts.userLayout.title' })}
           initialValues={{
             autoLogin: true,
           }}
-          actions={[
-            <FormattedMessage
-              key="loginWith"
-              id="pages.login.loginWith"
-              defaultMessage="其他登录方式"
-            />,
-            <ActionIcons key="icons" />,
-          ]}
-          onFinish={async (values) => {
-            await handleSubmit(values as API.LoginParams);
-          }}
+          // actions={[
+          //   <FormattedMessage
+          //     key="loginWith"
+          //     id="pages.login.loginWith"
+          //     defaultMessage="其他登录方式"
+          //   />,
+          //   <ActionIcons key="icons" />,
+          // ]}
+          onFinish={
+          //   async (values) => {
+          //   await handleSubmit(values as API.LoginParams);
+          // }
+          () => console.log('123')
+        }
         >
           <Tabs
             activeKey={type}
@@ -196,13 +201,13 @@ const Login: React.FC = () => {
                   defaultMessage: '账户密码登录',
                 }),
               },
-              {
-                key: 'mobile',
-                label: intl.formatMessage({
-                  id: 'pages.login.phoneLogin.tab',
-                  defaultMessage: '手机号登录',
-                }),
-              },
+              // {
+              //   key: 'mobile',
+              //   label: intl.formatMessage({
+              //     id: 'pages.login.phoneLogin.tab',
+              //     defaultMessage: '手机号登录',
+              //   }),
+              // },
             ]}
           />
 
@@ -222,10 +227,10 @@ const Login: React.FC = () => {
                   size: 'large',
                   prefix: <UserOutlined />,
                 }}
-                placeholder={intl.formatMessage({
-                  id: 'pages.login.username.placeholder',
-                  defaultMessage: '用户名: admin or user',
-                })}
+                // placeholder={intl.formatMessage({
+                //   id: 'pages.login.username.placeholder',
+                //   // defaultMessage: '用户名: admin or user',
+                // })}
                 rules={[
                   {
                     required: true,
@@ -244,10 +249,10 @@ const Login: React.FC = () => {
                   size: 'large',
                   prefix: <LockOutlined />,
                 }}
-                placeholder={intl.formatMessage({
-                  id: 'pages.login.password.placeholder',
-                  defaultMessage: '密码: ant.design',
-                })}
+                // placeholder={intl.formatMessage({
+                //   id: 'pages.login.password.placeholder',
+                //   // defaultMessage: '密码: ant.design',
+                // })}
                 rules={[
                   {
                     required: true,
@@ -357,8 +362,14 @@ const Login: React.FC = () => {
               style={{
                 float: 'right',
               }}
+              onClick={() => {
+                // history.push('/user/register');
+                console.log('123注册');
+              }}
             >
-              <FormattedMessage id="pages.login.forgotPassword" defaultMessage="忘记密码" />
+              <FormattedMessage id="pages.login.forgotPassword" defaultMessage="点击注册" 
+
+              />
             </a>
           </div>
         </LoginForm>
