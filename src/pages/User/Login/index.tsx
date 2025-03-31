@@ -1,26 +1,17 @@
 import { Footer } from '@/components';
-import { login } from '@/services/ant-design-pro/api';
 import { getFakeCaptcha } from '@/services/ant-design-pro/login';
-import {
-  AlipayCircleOutlined,
-  LockOutlined,
-  MobileOutlined,
-  TaobaoCircleOutlined,
-  UserOutlined,
-  WeiboCircleOutlined,
-} from '@ant-design/icons';
+import { LockOutlined, MobileOutlined, UserOutlined } from '@ant-design/icons';
 import {
   LoginForm,
   ProFormCaptcha,
   ProFormCheckbox,
   ProFormText,
 } from '@ant-design/pro-components';
-import { FormattedMessage, history, SelectLang, useIntl, useModel, Helmet } from '@umijs/max';
+import { FormattedMessage, Helmet, history, SelectLang, useIntl } from '@umijs/max';
 import { Alert, message, Tabs } from 'antd';
-import Settings from '../../../../config/defaultSettings';
-import React, { useState } from 'react';
-import { flushSync } from 'react-dom';
 import { createStyles } from 'antd-style';
+import React, { useState } from 'react';
+import Settings from '../../../../config/defaultSettings';
 import logoImg from '../../../../public/images/logo.png';
 
 const useStyles = createStyles(({ token }) => {
@@ -53,24 +44,13 @@ const useStyles = createStyles(({ token }) => {
       height: '100vh',
       overflow: 'auto',
       // backgroundImage:
-        // "url('https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/V-_oS6r-i7wAAAAAAAAAAAAAFl94AQBr')",
+      // "url('https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/V-_oS6r-i7wAAAAAAAAAAAAAFl94AQBr')",
       backgroundSize: '100% 100%',
-      background: 'radial-gradient(circle at center,rgb(238, 243, 247) 0%,rgb(196, 223, 246) 40%, #722ed1 100%)',
+      background:
+        'radial-gradient(circle at center,rgb(252, 254, 255) 0%,rgb(196, 219, 240) 40%,rgb(185, 150, 234) 100%)',
     },
   };
 });
-
-const ActionIcons = () => {
-  const { styles } = useStyles();
-
-  return (
-    <>
-      <AlipayCircleOutlined key="AlipayCircleOutlined" className={styles.action} />
-      <TaobaoCircleOutlined key="TaobaoCircleOutlined" className={styles.action} />
-      <WeiboCircleOutlined key="WeiboCircleOutlined" className={styles.action} />
-    </>
-  );
-};
 
 const Lang = () => {
   const { styles } = useStyles();
@@ -98,51 +78,65 @@ const LoginMessage: React.FC<{
 };
 
 const Login: React.FC = () => {
-  const [userLoginState, setUserLoginState] = useState<API.LoginResult>({});
+  const [userLoginState] = useState<API.LoginResult>({});
   const [type, setType] = useState<string>('account');
-  const { initialState, setInitialState } = useModel('@@initialState');
   const { styles } = useStyles();
   const intl = useIntl();
 
-  const fetchUserInfo = async () => {
-    const userInfo = await initialState?.fetchUserInfo?.();
-    if (userInfo) {
-      flushSync(() => {
-        setInitialState((s) => ({
-          ...s,
-          currentUser: userInfo,
-        }));
+  const handleSubmit = async (values: API.LoginParams) => {
+    try {
+      const response = await fetch('http://localhost:8000/api/login/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_account: values.username,
+          password: values.password,
+        }),
       });
+
+      const data = await response.json();
+      console.log('登录响应:', data);
+
+      if (data.code === 200) {
+        // 登录成功，存储用户信息
+        const userInfo = {
+          user_id: data.user_id,
+          name: data.user_info.name,
+          user_account: data.user_info.user_account,
+          phone: data.user_info.phone,
+          avatar: 'https://img.rongyuejiaoyu.com/uploads/20240728/02511242750.jpeg', // 默认头像
+          create_time: new Date(data.user_info.created_time).toLocaleString('zh-CN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false,
+          }),
+          last_login: new Date().toLocaleString(),
+        };
+
+        // 存储用户信息
+        localStorage.setItem('userInfo', JSON.stringify(userInfo));
+        // 存储登录状态
+        localStorage.setItem('isLogin', 'true');
+
+        message.success('登录成功！');
+        // 跳转到 welcome 页面
+        history.push('/welcome');
+        return;
+      } else {
+        message.error(data.msg || '登录失败，请重试！');
+      }
+    } catch (error) {
+      console.error('登录错误:', error);
+      message.error('登录失败，请重试！');
     }
   };
 
-  const handleSubmit = async (values: API.LoginParams) => {
-    try {
-      // 登录
-      const msg = await login({ ...values, type });
-      if (msg.status === 'ok') {
-        const defaultLoginSuccessMessage = intl.formatMessage({
-          id: 'pages.login.success',
-          defaultMessage: '登录成功！',
-        });
-        message.success(defaultLoginSuccessMessage);
-        await fetchUserInfo();
-        const urlParams = new URL(window.location.href).searchParams;
-        history.push(urlParams.get('redirect') || '/');
-        return;
-      }
-      console.log(msg);
-      // 如果失败去设置用户错误信息
-      setUserLoginState(msg);
-    } catch (error) {
-      const defaultLoginFailureMessage = intl.formatMessage({
-        id: 'pages.login.failure',
-        defaultMessage: '登录失败，请重试！',
-      });
-      console.log(error);
-      message.error(defaultLoginFailureMessage);
-    }
-  };
   const { status, type: loginType } = userLoginState;
 
   return (
@@ -183,11 +177,16 @@ const Login: React.FC = () => {
           //   <ActionIcons key="icons" />,
           // ]}
           onFinish={
-          //   async (values) => {
-          //   await handleSubmit(values as API.LoginParams);
-          // }
-          () => console.log('123')
-        }
+            async (values) => {
+              await handleSubmit(values as API.LoginParams);
+            }
+            // 登录接口 aaa
+
+            // () => {
+            //   history.push('/admin');
+            //   console.log('123登录');
+            // }
+          }
         >
           <Tabs
             activeKey={type}
@@ -363,13 +362,11 @@ const Login: React.FC = () => {
                 float: 'right',
               }}
               onClick={() => {
-                // history.push('/user/register');
+                history.push('/user/register');
                 console.log('123注册');
               }}
             >
-              <FormattedMessage id="pages.login.forgotPassword" defaultMessage="点击注册" 
-
-              />
+              <FormattedMessage id="pages.login.forgotPassword" defaultMessage="点击注册" />
             </a>
           </div>
         </LoginForm>
