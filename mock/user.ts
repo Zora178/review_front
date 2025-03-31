@@ -44,10 +44,10 @@ export default {
     res.send({
       success: true,
       data: {
-        name: 'Serati Ma',
-        avatar: 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
+        name: '陈小小',
+        avatar: 'https://img.rongyuejiaoyu.com/uploads/20240728/02511242750.jpeg',
         userid: '00000001',
-        email: 'antdesign@alipay.com',
+        email: '1234567890@qq.com',
         signature: '海纳百川，有容乃大',
         title: '交互专家',
         group: '蚂蚁金服－某某某事业群－某某平台部－某某技术部－UED',
@@ -92,7 +92,7 @@ export default {
           },
         },
         address: '西湖区工专路 77 号',
-        phone: '0752-268888888',
+        phone: '15716937222',
       },
     });
   },

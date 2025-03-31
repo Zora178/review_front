@@ -1,5 +1,8 @@
 export default {
   '/api/auth_routes': {
-    '/form/advanced-form': { authority: ['admin', 'user'] },
+    '/welcome': { authority: ['user'] },
+    '/user/center': { authority: ['user'] },
+    '/admin': { authority: ['user'] },
+    '/form/advanced-form': { authority: ['user'] },
   },
 };

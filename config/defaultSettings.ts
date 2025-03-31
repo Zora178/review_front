@@ -1,5 +1,4 @@
 import { ProLayoutProps } from '@ant-design/pro-components';
-
 /**
  * @name
  */
@@ -7,7 +6,6 @@ const Settings: ProLayoutProps & {
   pwa?: boolean;
   logo?: string;
 } = {
-  
   navTheme: 'light',
   // 数据分析主题色
   colorPrimary: '#FF6A00',
@@ -18,7 +16,7 @@ const Settings: ProLayoutProps & {
   colorWeak: false,
   title: '商品评论智能分析系统',
   pwa: true,
-  logo: 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
+  logo: '/images/logo.png',
   iconfontUrl: '',
   token: {
     // 参见ts声明，demo 见文档，通过token 修改样式

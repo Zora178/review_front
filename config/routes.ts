@@ -20,19 +20,24 @@ export default [
         path: '/user/login',
         component: './User/Login',
       },
+      {
+        name: 'register',
+        path: '/user/register',
+        component: './User/Register',
+      },
     ],
   },
   {
     path: '/welcome',
-    name: 'welcome',
+    name: '首页',
     icon: 'smile',
     component: './Welcome',
   },
   {
     path: '/admin',
-    name: 'admin',
+    name: '评论分析中心',
     icon: 'crown',
-    access: 'canAdmin',
+    // access: 'canAdmin',
     routes: [
       {
         path: '/admin',
@@ -40,17 +45,39 @@ export default [
       },
       {
         path: '/admin/sub-page',
-        name: 'sub-page',
+        name: '可视化报告',
         component: './Admin',
       },
     ],
   },
   {
-    name: 'list.table-list',
-    icon: 'table',
-    path: '/list',
-    component: './TableList',
+    path: '/center',
+    name: '个人中心',
+    icon: 'crown',
+    // access: 'canAdmin',
+    routes: [
+      {
+        path: '/center',
+        redirect: '/center/sub-page',
+      },
+      {
+        path: '/center/sub-page',
+        name: '个人信息',
+        component: './Center',
+      },
+      {
+        path: '/center/sub-search-page',
+        name: '个人搜索记录',
+        component: './CurrentSearch',
+      },
+    ],
   },
+  // {
+  //   name: 'list.table-list',
+  //   icon: 'table',
+  //   path: '/list',
+  //   component: './TableList',
+  // },
   {
     path: '/',
     redirect: '/welcome',
