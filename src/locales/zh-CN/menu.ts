@@ -49,4 +49,9 @@ export default {
   'menu.editor.flow': '流程编辑器',
   'menu.editor.mind': '脑图编辑器',
   'menu.editor.koni': '拓扑编辑器',
+  'menu.个人中心': '个人中心',
+  'menu.个人中心.个人搜索记录': '个人搜索记录',
+  'menu.个人中心.个人信息': '个人信息',
+  'menu.个人中心.个人设置': '个人设置',
+  'menu.个人中心.退出登录': '退出登录',
 };
