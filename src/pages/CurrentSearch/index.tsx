@@ -1,8 +1,6 @@
-import { searchRecords } from '@/mock/searchRecords';
-import { SearchOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
-import { Button, Card, List, Modal, Tag, Typography } from 'antd';
+import { Button, Card, List, Modal, Tag, Typography, message } from 'antd';
 import { useRef, useState } from 'react';
 
 interface SearchRecordItem {
@@ -30,15 +28,28 @@ const CurrentSearch: React.FC = () => {
       title: '搜索关键词',
       dataIndex: 'search_key',
       valueType: 'text',
-      search: true,
+      search: {
+        transform: (value) => ({ search_key: value }),
+      },
       render: (text) => <Tag color="blue">{text}</Tag>,
     },
     {
       title: '搜索时间',
       dataIndex: 'created_time',
-      valueType: 'dateTime',
+      valueType: 'dateRange',
       sorter: true,
-      search: true,
+      search: {
+        transform: (value) => {
+          if (value && value.length === 2) {
+            return {
+              start_time: value[0],
+              end_time: value[1],
+            };
+          }
+          return {};
+        },
+      },
+      width: 180,
     },
     {
       title: '更新时间',
@@ -46,6 +57,7 @@ const CurrentSearch: React.FC = () => {
       valueType: 'dateTime',
       sorter: true,
       search: false,
+      width: 180,
     },
     {
       title: '关键词',
@@ -53,7 +65,7 @@ const CurrentSearch: React.FC = () => {
       search: false,
       render: (_, record) => (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-          {record.total_word.map((word, index) => (
+          {record.total_word.slice(0, 15).map((word, index) => (
             <Tag key={index} color="green">
               {word}
             </Tag>
@@ -104,19 +116,78 @@ const CurrentSearch: React.FC = () => {
         rowKey="id"
         search={{
           labelWidth: 120,
+          defaultCollapsed: false,
         }}
-        toolBarRender={() => [
-          <Button type="primary" key="primary" icon={<SearchOutlined />}>
-            搜索
-          </Button>,
-        ]}
-        request={async () => {
-          // 使用模拟数据
-          return {
-            data: searchRecords,
-            success: true,
-            total: searchRecords.length,
-          };
+        toolBarRender={() => []}
+        request={async (params) => {
+          try {
+            const userInfoStr = localStorage.getItem('userInfo');
+            const userInfo = userInfoStr ? JSON.parse(userInfoStr) : {};
+
+            // 构建查询参数
+            const queryParams = new URLSearchParams();
+            if (params.search_key) {
+              queryParams.append('search_key', params.search_key);
+            }
+            if (params.start_time) {
+              queryParams.append('start_time', params.start_time);
+            }
+            if (params.end_time) {
+              queryParams.append('end_time', params.end_time);
+            }
+
+            const response = await fetch(
+              `http://localhost:8000/api/user/comments/${
+                userInfo.user_id
+              }/?${queryParams.toString()}`,
+              {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+              },
+            );
+
+            const result = await response.json();
+
+            if (response.ok && result.code === 200) {
+              // 前端模糊搜索
+              let filteredData = result.data;
+              if (params.search_key) {
+                filteredData = filteredData.filter((item: SearchRecordItem) =>
+                  item.search_key.includes(params.search_key),
+                );
+              }
+              if (params.start_time && params.end_time) {
+                filteredData = filteredData.filter((item: SearchRecordItem) => {
+                  const createdTime = new Date(item.created_time).getTime();
+                  const startTime = new Date(params.start_time).getTime();
+                  const endTime = new Date(params.end_time).getTime();
+                  return createdTime >= startTime && createdTime <= endTime;
+                });
+              }
+
+              return {
+                data: filteredData,
+                success: true,
+                total: filteredData.length,
+              };
+            } else {
+              message.error(result.msg || '获取评论列表失败');
+              return {
+                data: [],
+                success: false,
+                total: 0,
+              };
+            }
+          } catch (error) {
+            message.error('获取评论列表失败');
+            return {
+              data: [],
+              success: false,
+              total: 0,
+            };
+          }
         }}
         columns={columns}
         dateFormatter="string"

@@ -10,6 +10,7 @@ import {
 import { FormattedMessage, Helmet, history, SelectLang, useIntl } from '@umijs/max';
 import { Alert, message, Tabs } from 'antd';
 import { createStyles } from 'antd-style';
+import axios from 'axios';
 import React, { useState } from 'react';
 import Settings from '../../../../config/defaultSettings';
 import logoImg from '../../../../public/images/logo.png';
@@ -85,19 +86,10 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (values: API.LoginParams) => {
     try {
-      const response = await fetch('http://localhost:8000/api/login/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          user_account: values.username,
-          password: values.password,
-        }),
+      const { data } = await axios.post('http://localhost:8000/api/login/', {
+        user_account: values.username,
+        password: values.password,
       });
-
-      const data = await response.json();
-      console.log('登录响应:', data);
 
       if (data.code === 200) {
         // 登录成功，存储用户信息
@@ -127,7 +119,6 @@ const Login: React.FC = () => {
         message.success('登录成功！');
         // 跳转到 welcome 页面
         history.push('/welcome');
-        return;
       } else {
         message.error(data.msg || '登录失败，请重试！');
       }

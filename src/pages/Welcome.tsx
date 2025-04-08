@@ -93,7 +93,7 @@ const InfoCard: React.FC<{
         <Flex gap="4px 4px" wrap>
           {desc
             .split(',')
-            .slice(0, 25)
+            .slice(0, 10)
             .map((item, index) => (
               <Tag key={index} color={colors[Math.floor(Math.random() * colors.length)]}>
                 {item}
@@ -190,6 +190,7 @@ const Welcome: React.FC = () => {
           if (response.ok && result.code === 200) {
             // 将数据存储在 localStorage 中
             localStorage.setItem('conclusionData', JSON.stringify(result.data));
+            localStorage.setItem('currentSearchKey', value);
             setLoadingText('报告生成完成，正在跳转...');
             // 跳转到可视化页面
             history.push('/admin/sub-page');

@@ -23,7 +23,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ children }) =
       // 清除登录信息
       localStorage.removeItem('isLogin');
       localStorage.removeItem('userInfo');
-
+      localStorage.removeItem('conclusionData');
       message.success('退出登录成功');
       history.push('/user/login');
       return;
